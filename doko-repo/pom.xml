@@ -5,7 +5,11 @@
     <artifactId>doko</artifactId>
     <version>1.0.0</version>
   </parent>
-  <artifactId>doko-core</artifactId>
-  <name>Doko Core</name>
-  <description>Doko core engine</description>
+  <artifactId>doko-repo</artifactId>
+  <packaging>pom</packaging>
+  <name>Doko Repo</name>
+  <description>Repository implementation modules for Doko</description>
+  <modules>
+  	<module>doko-repo-props</module>
+  </modules>
 </project>

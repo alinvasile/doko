@@ -1,0 +1,26 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>com.github.alinvasile.doko</groupId>
+    <artifactId>doko-repo</artifactId>
+    <version>1.0.0</version>
+  </parent>
+  <artifactId>doko-repo-props</artifactId>
+  <name>Doko Repo Props</name>
+  <description>Properties Repository implementation using Java properties files</description>
+  <dependencies>
+  	<dependency>
+  		<groupId>commons-configuration</groupId>
+  		<artifactId>commons-configuration</artifactId>
+  		<version>1.9</version>
+  		<scope>runtime</scope>
+  	</dependency>
+  	 
+  	<dependency>
+  		<groupId>com.github.alinvasile.doko</groupId>
+  		<artifactId>doko-core</artifactId>
+  		<version>1.0.0</version>
+  	</dependency>
+  	
+  </dependencies>
+</project>

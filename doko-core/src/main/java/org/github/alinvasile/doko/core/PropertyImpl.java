@@ -3,13 +3,14 @@ package org.github.alinvasile.doko.core;
 import org.github.alinvasile.doko.ConfigurationSet;
 import org.github.alinvasile.doko.Property;
 
-class PropertyImpl<T> implements Property<T> {
+
+public class PropertyImpl implements Property {
     
     private String name;
     
     private String description; 
     
-    private T value;
+    private String value;
     
     private String applicableSystem;
     
@@ -33,11 +34,11 @@ class PropertyImpl<T> implements Property<T> {
         this.description = description;
     }
 
-    public T getValue() {
+    public String getValue() {
         return value;
     }
 
-    public void setValue(T value) {
+    public void setValue(String value) {
         this.value = value;
     }
 

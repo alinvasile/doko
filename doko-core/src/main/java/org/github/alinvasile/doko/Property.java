@@ -1,10 +1,10 @@
 package org.github.alinvasile.doko;
 
-public interface Property<T> {
+public interface Property {
 
     String getName();
     
-    T getValue();
+    String getValue();
     
     String getDescription();
     

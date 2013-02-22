@@ -5,7 +5,8 @@
     <artifactId>doko</artifactId>
     <version>1.0.0</version>
   </parent>
-  <artifactId>doko-core</artifactId>
-  <name>Doko Core</name>
-  <description>Doko core engine</description>
+  <artifactId>doko-client</artifactId>
+  <packaging>pom</packaging>
+  <name>Doko client</name>
+  <description>Collection of client libraries for accessing transports available in Doko</description>
 </project>
