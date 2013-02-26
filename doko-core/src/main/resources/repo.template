@@ -1,0 +1,8 @@
+<repositories>
+<repo>
+  <name>default</name>
+  <description>Default repository, backed up by a properties file</description>
+  <url>file://c:\temp\repository</url>
+  <provider>org.github.alinvasile.doko.repo.props.JavaPropertiesRepoOperations</provider>
+</repo>
+</repositories>

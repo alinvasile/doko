@@ -7,6 +7,8 @@ public class StorageConfig {
     private String description;
     
     private String url;
+    
+    private String provider;
 
     public String getName() {
         return name;
@@ -31,6 +33,16 @@ public class StorageConfig {
     public void setUrl(String url) {
         this.url = url;
     }
+
+    public String getProvider() {
+        return provider;
+    }
+
+    public void setProvider(String provider) {
+        this.provider = provider;
+    }
+    
+    
     
     
     

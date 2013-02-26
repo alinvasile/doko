@@ -9,10 +9,18 @@
   <name>Doko Repo Props</name>
   <description>Properties Repository implementation using Java properties files</description>
   <dependencies>
+  <!-- 
   	<dependency>
   		<groupId>commons-configuration</groupId>
   		<artifactId>commons-configuration</artifactId>
   		<version>1.9</version>
+  		<scope>runtime</scope>
+  	</dependency>
+  	 -->
+  	 <dependency>
+  		<groupId>commons-lang</groupId>
+  		<artifactId>commons-lang</artifactId>
+  		<version>2.5</version>
   		<scope>runtime</scope>
   	</dependency>
   	 

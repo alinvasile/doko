@@ -11,7 +11,7 @@ public interface ReadOnlyRepoOperations {
 
     PropertyImpl getProperty(String name, String configurationSet, String sourceSystem);
     
-    Set<PropertyImpl> getProperties(String configurationSet);
+    Set<PropertyImpl> getProperties(String configurationSet, String sourceSystem);
     
     ConfigurationSetImpl getConfigurationSet(String name);
     
