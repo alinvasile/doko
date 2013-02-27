@@ -23,12 +23,6 @@
   		<version>2.5</version>
   		<scope>runtime</scope>
   	</dependency>
-  	 
-  	<dependency>
-  		<groupId>com.github.alinvasile.doko</groupId>
-  		<artifactId>doko-core</artifactId>
-  		<version>1.0.0</version>
-  	</dependency>
   	
   </dependencies>
 </project>

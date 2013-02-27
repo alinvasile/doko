@@ -5,4 +5,12 @@
   <url>file://c:\temp\repository</url>
   <provider>org.github.alinvasile.doko.repo.props.JavaPropertiesRepoOperations</provider>
 </repo>
+
+<repo>
+  <name>stage</name>
+  <description>Stage repository, stored in memory, serves as a test space</description>
+  <url></url>
+  <provider>org.github.alinvasile.doko.repo.mem.InMemoryRepoOperations</provider>
+</repo>
+
 </repositories>

@@ -2,23 +2,25 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>com.github.alinvasile.doko</groupId>
-    <artifactId>doko</artifactId>
+    <artifactId>doko-repo</artifactId>
     <version>1.0.0</version>
   </parent>
-  <artifactId>doko-repo</artifactId>
-  <packaging>pom</packaging>
-  <name>Doko Repo</name>
-  <description>Repository implementation modules for Doko</description>
-  <modules>
-  	<module>doko-repo-props</module>
-  	<module>doko-repo-mem</module>
-  </modules>
+  <artifactId>doko-repo-mem</artifactId>
+  <description>Repository for Doko in memory</description>
   
   <dependencies>
   	<dependency>
-  		<groupId>com.github.alinvasile.doko</groupId>
-  		<artifactId>doko-core</artifactId>
-  		<version>1.0.0</version>
+  		<groupId>commons-lang</groupId>
+  		<artifactId>commons-lang</artifactId>
+  		<version>2.5</version>
+  		<scope>runtime</scope>
+  	</dependency>
+
+  	<dependency>
+  		<groupId>junit</groupId>
+  		<artifactId>junit</artifactId>
+  		<version>4.9</version>
+  		<scope>test</scope>
   	</dependency>
   </dependencies>
   

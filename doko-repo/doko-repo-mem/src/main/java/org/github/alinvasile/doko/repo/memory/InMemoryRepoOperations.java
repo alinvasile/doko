@@ -1,12 +1,9 @@
-package org.github.alinvasile.doko.repo.props;
+package org.github.alinvasile.doko.repo.memory;
 
-import java.io.FileInputStream;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.Enumeration;
 import java.util.HashSet;
-import java.util.Properties;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.lang.StringUtils;
 import org.github.alinvasile.doko.core.ConfigurationSetImpl;
@@ -15,42 +12,33 @@ import org.github.alinvasile.doko.repo.core.ManagementRepoOperations;
 import org.github.alinvasile.doko.repo.core.RepositoryException;
 import org.github.alinvasile.doko.repo.core.StorageConfig;
 
-class JavaPropertiesRepoOperations implements ManagementRepoOperations {
+class InMemoryRepoOperations implements ManagementRepoOperations {
     
     private final StorageConfig coreStorageConfig;
+
+    private Map<String,String> props = new ConcurrentHashMap<String, String>();
     
-    private final Properties props;
-    
-    private final Properties configSets;
+    private Map<String,String> configSets = new ConcurrentHashMap<String, String>();
     
     private final static String ALL_ENVS = "ALL";
     
-    public JavaPropertiesRepoOperations(StorageConfig coreStorageConfig) {
+    public InMemoryRepoOperations(StorageConfig coreStorageConfig) {
         this.coreStorageConfig = coreStorageConfig;
-        try {
-            props = new Properties();
-            props.load(new FileInputStream(getPropertiesFilePath()));
-            
-            configSets = new Properties();
-            configSets.load(new FileInputStream(geConfigSetFilePath()));
-        } catch (IOException e) {
-            throw new RepositoryException(e);
-        }
     }
 
     public String getRepositoryName() {
         return coreStorageConfig.getName();
     }
 
-    public  PropertyImpl getProperty(String name, String configurationSet, String sourceSystem) {
+    public PropertyImpl getProperty(String name, String configurationSet, String sourceSystem) {
         String baseName = computeBaseName(name,sourceSystem);
         
         boolean retrievedForSourceSystem = true;
         
-        String propName = (String)props.getProperty(baseName + ".name");
+        String propName = (String)props.get(baseName + ".name");
         if(StringUtils.isEmpty(propName)){
             retrievedForSourceSystem = false;
-            propName = (String)props.getProperty(computeBaseName(name,ALL_ENVS) + ".name");
+            propName = (String)props.get(computeBaseName(name,ALL_ENVS) + ".name");
         }
         
         if(StringUtils.isEmpty(propName)){
@@ -62,9 +50,9 @@ class JavaPropertiesRepoOperations implements ManagementRepoOperations {
             return null;
         }
         
-        String value = (String)props.getProperty(baseName + ".value");
-        String description = (String)props.getProperty(baseName + ".description");
-        String cacheable = (String)props.getProperty(baseName + ".cacheable");
+        String value = (String)props.get(baseName + ".value");
+        String description = (String)props.get(baseName + ".description");
+        String cacheable = (String)props.get(baseName + ".cacheable");
         
         PropertyImpl prop = new PropertyImpl();
         prop.setName(name);
@@ -74,12 +62,11 @@ class JavaPropertiesRepoOperations implements ManagementRepoOperations {
         prop.setDescription(description);
         prop.setValue(value);
         
-        return prop;        
+        return prop;   
     }
 
-    public  Set<PropertyImpl> getProperties(String configurationSet, String sourceSystem) {
-        // check if configuration set exists
-        Object configSet = configSets.getProperty(configurationSet);
+    public Set<PropertyImpl> getProperties(String configurationSet, String sourceSystem) {
+        Object configSet = configSets.get(configurationSet);
         if(configSet == null){
             return new HashSet<PropertyImpl>();
         }
@@ -87,9 +74,8 @@ class JavaPropertiesRepoOperations implements ManagementRepoOperations {
         Set<PropertyImpl> returnProps = new HashSet<PropertyImpl>();
         
         Set<String> properties = new HashSet<String>();
-        Enumeration<?> propertyNames = props.propertyNames();
-        while(propertyNames.hasMoreElements()){
-            String key = (String) propertyNames.nextElement();
+        Set<String> propertyNames = props.keySet();
+        for(String key:propertyNames){
             if(!key.endsWith(".configurationSet")){
                 continue;
             }
@@ -121,25 +107,35 @@ class JavaPropertiesRepoOperations implements ManagementRepoOperations {
         return returnProps;
     }
 
+    public ConfigurationSetImpl getConfigurationSet(String name) {
+        String cfgName = (String)configSets.get(name + ".name");
+        String cfgDesc = (String)configSets.get(name+".description");
+        
+        if(StringUtils.isEmpty(cfgName)){
+            return null;
+        }
+        
+        return new ConfigurationSetImpl(cfgName, cfgDesc);
+    }
+
     public synchronized void insertOrUpdateProperty(PropertyImpl prop) {
         String baseName = computeBaseName(prop.getName(),prop.getApplicableSystem());
         
-        props.setProperty(baseName + ".name", prop.getName());
-        props.setProperty(baseName + ".value", prop.getValue());
-        props.setProperty(baseName + ".description", prop.getDescription());
-        props.setProperty(baseName + ".configurationSet", prop.getConfigurationSet().getName());
-        props.setProperty(baseName + ".cacheable", String.valueOf(prop.isCacheable()));
+        props.put(baseName + ".name", prop.getName());
+        props.put(baseName + ".value", prop.getValue());
+        props.put(baseName + ".description", prop.getDescription());
+        props.put(baseName + ".configurationSet", prop.getConfigurationSet().getName());
+        props.put(baseName + ".cacheable", String.valueOf(prop.isCacheable()));
         
-        persistProperties();
+        //TODO check if configuration set exists
     }
 
     public synchronized void insertOrUpdateConfigurationSet(ConfigurationSetImpl cfgSet) {
         String baseName = cfgSet.getName();
-                
-        configSets.setProperty(baseName + ".name", cfgSet.getName());
-        configSets.setProperty(baseName + ".description", cfgSet.getDescription());
         
-        persistConfigurationSets();
+        configSets.put(baseName + ".name", cfgSet.getName());
+        configSets.put(baseName + ".description", cfgSet.getDescription());
+        
     }
 
     public synchronized void deleteProperty(PropertyImpl prop) {
@@ -151,16 +147,12 @@ class JavaPropertiesRepoOperations implements ManagementRepoOperations {
         props.remove(baseName + ".configurationSet");
         props.remove(baseName + ".cacheable");
         
-        persistProperties();
-        
     }
 
-    public synchronized void deleteConfigurationSet(ConfigurationSetImpl cfgSet, boolean force) {
-        
+    public void deleteConfigurationSet(ConfigurationSetImpl cfgSet, boolean force) {
         Set<String> properties = new HashSet<String>();
-        Enumeration<?> propertyNames = props.propertyNames();
-        while(propertyNames.hasMoreElements()){
-            String key = (String) propertyNames.nextElement();
+        Set<String> propertyNames = props.keySet();
+        for( String key:propertyNames){
             if(!key.endsWith(".configurationSet")){
                 continue;
             }
@@ -182,7 +174,6 @@ class JavaPropertiesRepoOperations implements ManagementRepoOperations {
                 props.remove(baseName + ".cacheable");
             }
             
-            persistProperties();
         } else {
             if(!properties.isEmpty()){
                 throw new RepositoryException("Properties are still assigned to configuration set [" + cfgSet.getName() + "]");
@@ -192,58 +183,10 @@ class JavaPropertiesRepoOperations implements ManagementRepoOperations {
         configSets.remove(cfgSet.getName() + ".name");
         configSets.remove(cfgSet.getName() + ".description");
         
-        persistConfigurationSets();
-        
-    }
-
-    public ConfigurationSetImpl getConfigurationSet(String name) {
-        String cfgName = (String)configSets.getProperty(name + ".name");
-        String cfgDesc = (String)configSets.getProperty(name+".description");
-        
-        if(StringUtils.isEmpty(cfgName)){
-            return null;
-        }
-        
-        return new ConfigurationSetImpl(cfgName, cfgDesc);
-    }
-    
-    
-    
-    private synchronized void persistProperties(){
-        try {
-            props.store(new FileWriter(getPropertiesFilePath()), null);
-        } catch (IOException e) {
-            throw new RepositoryException(e);
-        }
-    }
-    
-    private synchronized void persistConfigurationSets(){
-        try {
-            configSets.store(new FileWriter(geConfigSetFilePath()), null);
-        } catch (IOException e) {
-            throw new RepositoryException(e);
-        }
     }
     
     private String computeBaseName(String name, String sourceSystem){
         return name + "." + sourceSystem;
     }
     
-    
-    private String getPropertiesFilePath(){
-        return getBasePath() +  "props.properties";
-    }
-    
-    private String geConfigSetFilePath(){
-        return getBasePath() +  "cfgs.properties";
-    }
-    
-    private String getBasePath(){
-        return coreStorageConfig.getUrl() + System.getProperty("file.separator") + getRepositoryName() + System.getProperty("file.separator");
-    }
-    
-    public synchronized void destroy(){
-        
-    }
-
 }
