@@ -1,6 +1,7 @@
 package org.github.alinvasile.doko.repo.props;
 
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Enumeration;
@@ -27,12 +28,22 @@ class JavaPropertiesRepoOperations implements ManagementRepoOperations {
     
     public JavaPropertiesRepoOperations(StorageConfig coreStorageConfig) {
         this.coreStorageConfig = coreStorageConfig;
+        
+        props = new Properties();
+        configSets = new Properties();
+        
         try {
-            props = new Properties();
             props.load(new FileInputStream(getPropertiesFilePath()));
-            
-            configSets = new Properties();
+        } catch (FileNotFoundException e) {
+            // ignore
+        } catch(IOException e){
+            throw new RepositoryException(e);
+        } 
+        
+        try {
             configSets.load(new FileInputStream(geConfigSetFilePath()));
+        } catch (FileNotFoundException e) {
+            // ignore
         } catch (IOException e) {
             throw new RepositoryException(e);
         }
@@ -50,7 +61,8 @@ class JavaPropertiesRepoOperations implements ManagementRepoOperations {
         String propName = (String)props.getProperty(baseName + ".name");
         if(StringUtils.isEmpty(propName)){
             retrievedForSourceSystem = false;
-            propName = (String)props.getProperty(computeBaseName(name,ALL_ENVS) + ".name");
+            baseName = computeBaseName(name,ALL_ENVS);
+            propName = (String)props.get(baseName + ".name");
         }
         
         if(StringUtils.isEmpty(propName)){
@@ -226,6 +238,9 @@ class JavaPropertiesRepoOperations implements ManagementRepoOperations {
     }
     
     private String computeBaseName(String name, String sourceSystem){
+        if(sourceSystem == null){
+            sourceSystem =  ALL_ENVS;
+        }
         return name + "." + sourceSystem;
     }
     

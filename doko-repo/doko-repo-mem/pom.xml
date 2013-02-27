@@ -6,6 +6,8 @@
     <version>1.0.0</version>
   </parent>
   <artifactId>doko-repo-mem</artifactId>
+  
+  <name>Doko Repo in Memory</name>
   <description>Repository for Doko in memory</description>
   
   <dependencies>

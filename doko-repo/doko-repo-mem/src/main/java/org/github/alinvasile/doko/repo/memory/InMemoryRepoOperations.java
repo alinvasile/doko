@@ -38,7 +38,8 @@ class InMemoryRepoOperations implements ManagementRepoOperations {
         String propName = (String)props.get(baseName + ".name");
         if(StringUtils.isEmpty(propName)){
             retrievedForSourceSystem = false;
-            propName = (String)props.get(computeBaseName(name,ALL_ENVS) + ".name");
+            baseName = computeBaseName(name,ALL_ENVS);
+            propName = (String)props.get(baseName + ".name");
         }
         
         if(StringUtils.isEmpty(propName)){
@@ -186,6 +187,9 @@ class InMemoryRepoOperations implements ManagementRepoOperations {
     }
     
     private String computeBaseName(String name, String sourceSystem){
+        if(sourceSystem == null){
+            sourceSystem =  ALL_ENVS;
+        }
         return name + "." + sourceSystem;
     }
     

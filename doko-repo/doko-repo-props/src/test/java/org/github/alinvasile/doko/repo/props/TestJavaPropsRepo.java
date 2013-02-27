@@ -1,10 +1,13 @@
-package org.github.alinvasile.doko.repo.memory;
+package org.github.alinvasile.doko.repo.props;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+
+import java.io.File;
+import java.io.IOException;
 
 import org.github.alinvasile.doko.core.ConfigurationSetImpl;
 import org.github.alinvasile.doko.core.PropertyImpl;
@@ -15,16 +18,24 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-public class TestInMemoryRepo {
+import com.google.common.io.Files;
+
+public class TestJavaPropsRepo {
 
     private ManagementRepoOperations repo;
+    private File myTempDir;
     
     @Before
-    public void before(){
+    public void before() throws IOException{
         StorageConfig config = new StorageConfig();
         config.setName("test");
         config.setDescription("test repo");
-        InMemoryRepoProvider provider = new InMemoryRepoProvider(config);
+        
+        myTempDir = Files.createTempDir();
+        File repositoryFolder = new File(myTempDir.getAbsolutePath(),"test");
+        repositoryFolder.mkdir();
+        config.setUrl(myTempDir.getPath());
+        JavaPropertiesRepoProvider provider = new JavaPropertiesRepoProvider(config);
         
         repo = provider.managementOperations();
     }
@@ -32,6 +43,7 @@ public class TestInMemoryRepo {
     @After
     public void after(){
         repo = null;
+        myTempDir.delete();
     }
     
     @Test
